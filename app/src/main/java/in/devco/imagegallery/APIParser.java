@@ -1,6 +1,6 @@
 package in.devco.imagegallery;
 
-import in.devco.imagegallery.objects.Result;
+import in.devco.imagegallery.Model.Result;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;

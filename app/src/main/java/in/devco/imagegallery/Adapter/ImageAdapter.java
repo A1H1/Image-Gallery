@@ -1,4 +1,4 @@
-package in.devco.imagegallery;
+package in.devco.imagegallery.Adapter;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -13,13 +13,14 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import java.util.List;
 
-import in.devco.imagegallery.objects.Photo;
+import in.devco.imagegallery.Model.Photo;
+import in.devco.imagegallery.R;
 
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHolder> {
     private Context context;
     private List<Photo> photos;
 
-    ImageAdapter(Context context, List<Photo> photos) {
+    public ImageAdapter(Context context, List<Photo> photos) {
         this.context = context;
         this.photos = photos;
     }

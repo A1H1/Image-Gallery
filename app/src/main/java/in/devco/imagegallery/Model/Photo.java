@@ -1,4 +1,4 @@
-package in.devco.imagegallery.objects;
+package in.devco.imagegallery.Model;
 
 public class Photo {
     private String id;
