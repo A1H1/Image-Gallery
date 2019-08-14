@@ -7,4 +7,5 @@ import in.devco.imagegallery.Model.Photo;
 public interface IPhotoListView {
     void update(List<Photo> photos);
     void updateFailed();
+    void loadMore(List<Photo> photos);
 }

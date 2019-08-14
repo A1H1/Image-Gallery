@@ -14,6 +14,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AbsListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.List;
@@ -26,12 +28,18 @@ import in.devco.imagegallery.R;
 import in.devco.imagegallery.View.IPhotoListView;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, SwipeRefreshLayout.OnRefreshListener, IPhotoListView {
+        implements NavigationView.OnNavigationItemSelectedListener,
+        SwipeRefreshLayout.OnRefreshListener,
+        IPhotoListView {
 
     private RecyclerView recyclerView;
     private SwipeRefreshLayout swipeRefreshLayout;
     private IPhotoListPresenter photoListPresenter;
     private TextView textView;
+    private LinearLayoutManager layoutManager;
+    private ImageAdapter imageAdapter;
+    private List<Photo> photos;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,13 +100,16 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onRefresh() {
         photoListPresenter.fetchData();
+        photoListPresenter.reset();
     }
 
     @Override
     public void update(List<Photo> photos) {
+        this.photos = photos;
+        imageAdapter = new ImageAdapter(MainActivity.this, this.photos);
         recyclerView.setVisibility(View.VISIBLE);
         textView.setVisibility(View.GONE);
-        recyclerView.setAdapter(new ImageAdapter(MainActivity.this, photos));
+        recyclerView.setAdapter(imageAdapter);
         swipeRefreshLayout.setRefreshing(false);
     }
 
@@ -107,6 +118,13 @@ public class MainActivity extends AppCompatActivity
         recyclerView.setVisibility(View.GONE);
         textView.setVisibility(View.VISIBLE);
         swipeRefreshLayout.setRefreshing(false);
+    }
+
+    @Override
+    public void loadMore(List<Photo> photos) {
+        progressBar.setVisibility(View.GONE);
+        this.photos.addAll(photos);
+        imageAdapter.notifyDataSetChanged();
     }
 
     void init() {
@@ -120,8 +138,11 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
 
+        layoutManager = new LinearLayoutManager(this);
+
         recyclerView = findViewById(R.id.main_activity_rv);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.addOnScrollListener(new ScrollListener());
 
         swipeRefreshLayout = findViewById(R.id.main_activity_srl);
         swipeRefreshLayout.setOnRefreshListener(this);
@@ -130,5 +151,27 @@ public class MainActivity extends AppCompatActivity
         photoListPresenter.fetchData();
 
         textView = findViewById(R.id.main_activity_tv);
+        progressBar = findViewById(R.id.main_activity_pb);
+    }
+
+    private class ScrollListener extends RecyclerView.OnScrollListener {
+        private boolean isScrolling = false;
+
+        @Override
+        public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+            super.onScrollStateChanged(recyclerView, newState);
+            if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL)
+                isScrolling = true;
+        }
+
+        @Override
+        public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+            super.onScrolled(recyclerView, dx, dy);
+            if (isScrolling && (layoutManager.getChildCount() + layoutManager.findFirstVisibleItemPosition() == layoutManager.getItemCount())) {
+                progressBar.setVisibility(View.VISIBLE);
+                photoListPresenter.loadMoreData();
+                isScrolling = false;
+            }
+        }
     }
 }

@@ -17,6 +17,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class PhotoListPresenter implements IPhotoListPresenter, Callback<Result> {
     private final String TAG = "Retrofit";
     private IPhotoListView iPhotoListView;
+    private int page = 1;
+    private boolean loadMore = false;
 
     public PhotoListPresenter(IPhotoListView iPhotoListView) {
         this.iPhotoListView = iPhotoListView;
@@ -30,8 +32,20 @@ public class PhotoListPresenter implements IPhotoListPresenter, Callback<Result>
                 .build();
 
         APIParser apiParser = retrofit.create(APIParser.class);
-        Call<Result> call = apiParser.getImages(Config.METHOD, 20, 1, Config.API_KEY, Config.FORMAT, 1, Config.EXTRAS);
+        Call<Result> call = apiParser.getImages(Config.METHOD, 20, page, Config.API_KEY, Config.FORMAT, 1, Config.EXTRAS);
         call.enqueue(this);
+    }
+
+    @Override
+    public void loadMoreData() {
+        loadMore = true;
+        page++;
+        fetchData();
+    }
+
+    @Override
+    public void reset() {
+        page = 1;
     }
 
     @Override
@@ -41,7 +55,11 @@ public class PhotoListPresenter implements IPhotoListPresenter, Callback<Result>
             iPhotoListView.updateFailed();
         } else{
             Photos photos = response.body().getPhotos();
-            iPhotoListView.update(photos.getPhoto());
+            if (loadMore) {
+                iPhotoListView.loadMore(photos.getPhoto());
+                loadMore = false;
+            } else
+                iPhotoListView.update(photos.getPhoto());
         }
     }
 

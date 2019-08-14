@@ -37,7 +37,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
     public void onBindViewHolder(@NonNull ImageViewHolder imageViewHolder, int i) {
         Photo photo = photos.get(i);
         Glide.with(context).load(photo.getUrl_s())
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .centerCrop()
                 .error(R.drawable.ic_placeholder_wallpaper)
                 .placeholder(R.drawable.ic_placeholder_wallpaper)
