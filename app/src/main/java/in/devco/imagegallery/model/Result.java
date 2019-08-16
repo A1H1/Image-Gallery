@@ -1,4 +1,4 @@
-package in.devco.imagegallery.Model;
+package in.devco.imagegallery.model;
 
 public class Result {
     private Photos photos;

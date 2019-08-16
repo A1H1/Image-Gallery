@@ -4,38 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/main_activity_rl"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".Activities.MainActivity"
-    android:background="#546e7a"
+    tools:context=".activities.MainActivity"
     tools:showIn="@layout/app_bar_main">
 
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/main_activity_srl"
+    <fragment
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/main_activity_rv"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scrollbars="vertical" />
-    </android.support.v4.widget.SwipeRefreshLayout>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:textColor="#fff"
-        android:id="@+id/main_activity_tv"
-        android:visibility="gone"
-        android:text="Failed to Load"
-        android:textSize="20sp" />
-
-    <ProgressBar
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/main_activity_pb"
-        android:visibility="gone"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"/>
+        android:layout_height="match_parent"
+        android:name="in.devco.imagegallery.fragment.HomePage"
+        android:id="@+id/main_activity_fragment"/>
 </RelativeLayout>

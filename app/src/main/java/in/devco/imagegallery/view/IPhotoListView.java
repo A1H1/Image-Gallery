@@ -1,8 +1,8 @@
-package in.devco.imagegallery.View;
+package in.devco.imagegallery.view;
 
 import java.util.List;
 
-import in.devco.imagegallery.Model.Photo;
+import in.devco.imagegallery.model.Photo;
 
 public interface IPhotoListView {
     void update(List<Photo> photos);

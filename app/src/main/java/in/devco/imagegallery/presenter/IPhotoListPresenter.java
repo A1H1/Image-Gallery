@@ -1,4 +1,4 @@
-package in.devco.imagegallery.Presenter;
+package in.devco.imagegallery.presenter;
 
 public interface IPhotoListPresenter {
     void fetchData();

@@ -1,4 +1,4 @@
-package in.devco.imagegallery.Model;
+package in.devco.imagegallery.model;
 
 import java.util.List;
 
