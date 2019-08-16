@@ -2,6 +2,7 @@ package in.devco.imagegallery.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.List;
@@ -24,8 +26,10 @@ import in.devco.imagegallery.view.IPhotoListView;
 
 public class HomePage extends Fragment implements
         SwipeRefreshLayout.OnRefreshListener,
-        IPhotoListView {
+        IPhotoListView,
+        View.OnClickListener {
 
+    private RelativeLayout relativeLayout;
     private RecyclerView recyclerView;
     private SwipeRefreshLayout swipeRefreshLayout;
     private IPhotoListPresenter photoListPresenter;
@@ -38,7 +42,7 @@ public class HomePage extends Fragment implements
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view =  inflater.inflate(R.layout.fragment_homepage, container, false);
+        View view = inflater.inflate(R.layout.fragment_homepage, container, false);
 
         layoutManager = new LinearLayoutManager(getContext());
         recyclerView = view.findViewById(R.id.main_activity_rv);
@@ -53,58 +57,68 @@ public class HomePage extends Fragment implements
 
         textView = view.findViewById(R.id.main_activity_tv);
         progressBar = view.findViewById(R.id.main_activity_pb);
+        relativeLayout = view.findViewById(R.id.homepage_content);
 
         return view;
-    }
+        }
+
+        @Override
+        public void onRefresh () {
+            photoListPresenter.fetchData();
+            photoListPresenter.reset();
+        }
+
+        @Override
+        public void update (List < Photo > photos) {
+            this.photos = photos;
+            imageAdapter = new ImageAdapter(getContext(), this.photos);
+            recyclerView.setVisibility(View.VISIBLE);
+            textView.setVisibility(View.GONE);
+            recyclerView.setAdapter(imageAdapter);
+            swipeRefreshLayout.setRefreshing(false);
+        }
+
+        @Override
+        public void updateFailed () {
+            recyclerView.setVisibility(View.GONE);
+            textView.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.GONE);
+            swipeRefreshLayout.setRefreshing(false);
+            Snackbar.make(relativeLayout, "No Internet", Snackbar.LENGTH_INDEFINITE)
+                    .setAction("Try Again", this)
+                    .show();
+        }
+
+        @Override
+        public void loadMore (List < Photo > photos) {
+            progressBar.setVisibility(View.GONE);
+            this.photos.addAll(photos);
+            imageAdapter.notifyDataSetChanged();
+        }
 
     @Override
-    public void onRefresh() {
+    public void onClick(View v) {
         photoListPresenter.fetchData();
-        photoListPresenter.reset();
-    }
-
-    @Override
-    public void update(List<Photo> photos) {
-        this.photos = photos;
-        imageAdapter = new ImageAdapter(getContext(), this.photos);
-        recyclerView.setVisibility(View.VISIBLE);
-        textView.setVisibility(View.GONE);
-        recyclerView.setAdapter(imageAdapter);
-        swipeRefreshLayout.setRefreshing(false);
-    }
-
-    @Override
-    public void updateFailed() {
-        recyclerView.setVisibility(View.GONE);
-        textView.setVisibility(View.VISIBLE);
-        swipeRefreshLayout.setRefreshing(false);
-    }
-
-    @Override
-    public void loadMore(List<Photo> photos) {
-        progressBar.setVisibility(View.GONE);
-        this.photos.addAll(photos);
-        imageAdapter.notifyDataSetChanged();
     }
 
     private class ScrollListener extends RecyclerView.OnScrollListener {
-        private boolean isScrolling = false;
+            private boolean isScrolling = false;
 
-        @Override
-        public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-            super.onScrollStateChanged(recyclerView, newState);
-            if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL)
-                isScrolling = true;
-        }
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL)
+                    isScrolling = true;
+            }
 
-        @Override
-        public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-            super.onScrolled(recyclerView, dx, dy);
-            if (isScrolling && (layoutManager.getChildCount() + layoutManager.findFirstVisibleItemPosition() == layoutManager.getItemCount())) {
-                progressBar.setVisibility(View.VISIBLE);
-                photoListPresenter.loadMoreData();
-                isScrolling = false;
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (isScrolling && (layoutManager.getChildCount() + layoutManager.findFirstVisibleItemPosition() == layoutManager.getItemCount())) {
+                    progressBar.setVisibility(View.VISIBLE);
+                    photoListPresenter.loadMoreData();
+                    isScrolling = false;
+                }
             }
         }
     }
-}

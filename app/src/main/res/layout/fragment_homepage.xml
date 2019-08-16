@@ -2,7 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#546e7a">
+    android:id="@+id/homepage_content"
+    android:background="@color/bg">
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/main_activity_srl"

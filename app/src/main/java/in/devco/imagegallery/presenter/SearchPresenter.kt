@@ -11,12 +11,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class SearchPresenter : ISearchPresenter, Callback<Result> {
-    private var searchView: ISearchView? = null
-
-    constructor(searchView: ISearchView?) {
-        this.searchView = searchView
-    }
+class SearchPresenter(private var searchView: ISearchView?) : ISearchPresenter, Callback<Result> {
 
     override fun search(text: String) {
         val retrofit = Retrofit.Builder()

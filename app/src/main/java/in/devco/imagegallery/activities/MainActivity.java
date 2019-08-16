@@ -1,5 +1,9 @@
 package in.devco.imagegallery.activities;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -11,6 +15,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import in.devco.imagegallery.R;
 import in.devco.imagegallery.fragment.HomePage;
@@ -58,7 +63,6 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle navigation view item clicks here.
@@ -90,5 +94,21 @@ public class MainActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
+
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            connectivityManager.registerDefaultNetworkCallback(new ConnectivityManager.NetworkCallback() {
+                @Override
+                public void onAvailable(Network network) {
+                    Toast.makeText(MainActivity.this, "Internet connection restored", Toast.LENGTH_LONG).show();
+                }
+
+                @Override
+                public void onLost(Network network) {
+                    Toast.makeText(MainActivity.this, "Internet connection lost", Toast.LENGTH_LONG).show();
+                }
+            });
+        }
     }
 }

@@ -7,20 +7,24 @@ import `in`.devco.imagegallery.presenter.ISearchPresenter
 import `in`.devco.imagegallery.presenter.SearchPresenter
 import `in`.devco.imagegallery.view.ISearchView
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.SearchView
 import android.view.*
 import android.widget.ProgressBar
+import android.widget.RelativeLayout
 import android.widget.TextView
 
-class Search : Fragment(), SearchView.OnQueryTextListener, ISearchView {
+class Search : Fragment(), SearchView.OnQueryTextListener, ISearchView, View.OnClickListener {
+    private var relativeLayout: RelativeLayout? = null
     private var recyclerView: RecyclerView? = null
     private var textView: TextView? = null
     private var progressBar: ProgressBar? = null
     private var searchPresenter: ISearchPresenter? = null
     private var layoutManager: LinearLayoutManager? = null
+    private var text:String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,6 +44,7 @@ class Search : Fragment(), SearchView.OnQueryTextListener, ISearchView {
 
         textView = view.findViewById(R.id.search_tv)
         progressBar = view.findViewById(R.id.search_pb)
+        relativeLayout = view.findViewById(R.id.search_content)
 
         return view
     }
@@ -57,6 +62,7 @@ class Search : Fragment(), SearchView.OnQueryTextListener, ISearchView {
     }
 
     override fun onQueryTextSubmit(p0: String?): Boolean {
+        text = p0
         progressBar?.visibility = View.VISIBLE
         searchPresenter?.search(p0.toString())
         return false
@@ -66,6 +72,11 @@ class Search : Fragment(), SearchView.OnQueryTextListener, ISearchView {
         recyclerView?.visibility = View.GONE
         progressBar?.visibility = View.GONE
         textView?.visibility = View.VISIBLE
+        view?.let {
+            Snackbar.make(it, "No Internet", Snackbar.LENGTH_INDEFINITE)
+                .setAction("Try Again", this)
+                .show()
+        }
     }
 
     override fun update(photos: List<Photo>) {
@@ -74,5 +85,9 @@ class Search : Fragment(), SearchView.OnQueryTextListener, ISearchView {
 
         textView?.visibility = View.GONE
         progressBar?.visibility = View.GONE
+    }
+
+    override fun onClick(v: View?) {
+        searchPresenter?.search(text.toString())
     }
 }
